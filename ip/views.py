@@ -8,8 +8,11 @@ class IPView(View):
         visitor_name = request.GET.get('visitor_name', 'Guest')
 
         # Get client IP
-        ip_response = requests.get('https://httpbin.org/ip')
-        client_ip = ip_response.json().get('origin')
+        client_ip = request.META.get('HTTP_X_FORWARDED_FOR')
+        if client_ip:
+            client_ip = client_ip.split(',')[0]
+        else:
+            client_ip = request.META.get('REMOTE_ADDR')
 
         # Get location information
         ip_info_url = f"https://ipinfo.io/{client_ip}/json"
